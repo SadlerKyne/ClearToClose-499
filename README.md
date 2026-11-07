@@ -3,5 +3,7 @@ Clear To Close: a .NET Blazor web app that tracks income, bills and debts and sh
 
 ## Favorite Quotes
 
-> "PowerPoint makes us stupid." — Gen. James Mattis (Shawn Kyne)
+> "PowerPoint makes us stupid." — Gen. James Mattis (Shawn Kyne).
+> 
 > "The future belongs to those who believe in the beauty of their dreams." - Eleanor Roosevelt (Monica Araceli Kyne)
+
