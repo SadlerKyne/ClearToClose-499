@@ -1,5 +1,5 @@
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 a, .btn-link {
@@ -8,8 +8,13 @@ a, .btn-link {
 
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #007AFF;
+    border-color: #007AFF;
+}
+
+.btn-primary:hover {
+    background-color: #0066D6;
+    border-color: #0066D6;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -48,4 +53,45 @@ h1:focus {
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
+}
+
+/* Login and Register card, same look as the ClearToClose bill tracker */
+.auth-card {
+    max-width: 420px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.auth-card h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.auth-subtitle {
+    color: rgba(60, 60, 67, 0.6);
+    margin-bottom: 1.5rem;
+}
+
+.auth-card .form-control {
+    border-radius: 10px;
+}
+
+.auth-card .btn-lg {
+    border-radius: 10px;
+}
+
+.auth-switch {
+    margin: 1.25rem 0 0;
+    text-align: center;
+    color: rgba(60, 60, 67, 0.6);
+}
+
+/* Grouped gray background behind the login card */
+body:has(.auth-card) main {
+    background: #F2F2F7;
+    min-height: 100vh;
 }
