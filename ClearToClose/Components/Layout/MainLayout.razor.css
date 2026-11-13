@@ -31,6 +31,17 @@ main {
         text-decoration: underline;
     }
 
+    .top-row .user-email {
+        color: rgba(60, 60, 67, 0.6);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .top-row form {
+        margin: 0;
+    }
+
     .top-row ::deep a:first-child {
         overflow: hidden;
         text-overflow: ellipsis;
