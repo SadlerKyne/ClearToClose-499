@@ -1,0 +1,122 @@
+@page "/income"
+@rendermode InteractiveServer
+@using System.Security.Claims
+@using ClearToClose.Data
+@using ClearToClose.Services
+@inject IncomeService IncomeService
+
+<PageTitle>Income - ClearToClose</PageTitle>
+
+<h1>Income</h1>
+<p>Add each source of income with the amount you get each month.</p>
+
+<div class="income-total">
+    Total monthly income: <strong>@IncomeService.MonthlyTotal(incomes).ToString("C")</strong>
+</div>
+
+<div class="card income-form">
+    <div class="card-body">
+        <h2 class="h5">@(editingId is null ? "Add income" : "Edit income")</h2>
+
+        <EditForm Model="form" OnValidSubmit="SaveAsync" FormName="income-form">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label for="income-name" class="form-label">Name</label>
+                <InputText id="income-name" class="form-control" @bind-Value="form.Name" placeholder="Paycheck" />
+                <ValidationMessage For="() => form.Name" />
+            </div>
+
+            <div class="mb-3">
+                <label for="income-amount" class="form-label">Monthly amount</label>
+                <InputNumber id="income-amount" class="form-control" @bind-Value="form.MonthlyAmount" step="0.01" />
+                <ValidationMessage For="() => form.MonthlyAmount" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">@(editingId is null ? "Add" : "Save")</button>
+            @if (editingId is not null)
+            {
+                <button type="button" class="btn btn-outline-secondary ms-2" @onclick="CancelEdit">Cancel</button>
+            }
+        </EditForm>
+    </div>
+</div>
+
+@if (incomes.Count == 0)
+{
+    <p class="text-muted">No income added yet.</p>
+}
+else
+{
+    <table class="table income-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th class="text-end">Monthly amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var income in incomes)
+            {
+                <tr>
+                    <td>@income.Name</td>
+                    <td class="text-end">@income.MonthlyAmount.ToString("C")</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-primary" @onclick="() => StartEdit(income)">Edit</button>
+                        <button class="btn btn-sm btn-outline-danger ms-1" @onclick="() => DeleteAsync(income.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    private string userId = "";
+    private List<Income> incomes = [];
+    private Income form = new();
+    private int? editingId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync() => incomes = await IncomeService.GetAllAsync(userId);
+
+    private async Task SaveAsync()
+    {
+        if (editingId is null)
+            await IncomeService.AddAsync(userId, form.Name, form.MonthlyAmount);
+        else
+            await IncomeService.UpdateAsync(userId, editingId.Value, form.Name, form.MonthlyAmount);
+
+        CancelEdit();
+        await LoadAsync();
+    }
+
+    private void StartEdit(Income income)
+    {
+        editingId = income.Id;
+        form = new Income { Name = income.Name, MonthlyAmount = income.MonthlyAmount };
+    }
+
+    private void CancelEdit()
+    {
+        editingId = null;
+        form = new Income();
+    }
+
+    private async Task DeleteAsync(int id)
+    {
+        await IncomeService.DeleteAsync(userId, id);
+        if (editingId == id) CancelEdit();
+        await LoadAsync();
+    }
+}

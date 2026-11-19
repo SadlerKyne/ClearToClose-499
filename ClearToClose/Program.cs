@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ClearToClose.Components;
 using ClearToClose.Components.Account;
 using ClearToClose.Data;
+using ClearToClose.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +25,11 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+// The factory lets each Blazor page action use its own short-lived DbContext.
+// It also registers ApplicationDbContext itself, which Identity uses.
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
+builder.Services.AddScoped<IncomeService>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // No email service is set up, so new accounts can log in without confirming their email.

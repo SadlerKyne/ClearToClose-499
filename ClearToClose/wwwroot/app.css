@@ -95,3 +95,17 @@ body:has(.auth-card) main {
     background: #F2F2F7;
     min-height: 100vh;
 }
+
+.income-total {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.income-form {
+    max-width: 28rem;
+    margin-bottom: 1.5rem;
+}
+
+.income-table {
+    max-width: 40rem;
+}
