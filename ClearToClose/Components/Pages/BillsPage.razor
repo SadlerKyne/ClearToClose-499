@@ -66,6 +66,7 @@ else
     <table class="table bill-table">
         <thead>
             <tr>
+                <th>Paid</th>
                 <th>Name</th>
                 <th>Category</th>
                 <th>Due day</th>
@@ -76,7 +77,13 @@ else
         <tbody>
             @foreach (var bill in bills)
             {
-                <tr>
+                var paid = BillService.IsPaidThisMonth(bill);
+                <tr class="@(paid ? "bill-paid" : "")">
+                    <td>
+                        <input type="checkbox" class="form-check-input" checked="@paid"
+                               title="Paid this month" aria-label="Paid this month for @bill.Name"
+                               @onchange="e => SetPaidAsync(bill.Id, e.Value is true)" />
+                    </td>
                     <td>@bill.Name</td>
                     <td>@bill.Category</td>
                     <td>@bill.DueDay</td>
@@ -130,6 +137,12 @@ else
     {
         editingId = null;
         form = new Bill();
+    }
+
+    private async Task SetPaidAsync(int id, bool paid)
+    {
+        await BillService.SetPaidAsync(userId, id, paid);
+        await LoadAsync();
     }
 
     private async Task DeleteAsync(int id)
