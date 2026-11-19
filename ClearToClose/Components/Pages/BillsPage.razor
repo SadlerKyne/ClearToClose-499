@@ -10,6 +10,11 @@
 <h1>Bills</h1>
 <p>Add your monthly bills and mark each one paid as you pay it this month.</p>
 
+<div class="bill-totals">
+    <div>Total monthly bills: <strong>@BillService.MonthlyTotal(bills).ToString("C")</strong></div>
+    <div>Still due this month: <strong>@BillService.StillDue(bills).ToString("C")</strong></div>
+</div>
+
 <div class="card bill-form">
     <div class="card-body">
         <h2 class="h5">@(editingId is null ? "Add bill" : "Edit bill")</h2>
