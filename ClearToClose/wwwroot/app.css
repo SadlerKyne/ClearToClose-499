@@ -95,3 +95,28 @@ body:has(.auth-card) main {
     background: #F2F2F7;
     min-height: 100vh;
 }
+
+.bill-totals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.bill-form {
+    max-width: 32rem;
+    margin-bottom: 1.5rem;
+}
+
+.bill-table {
+    max-width: 52rem;
+}
+
+.bill-table tr.bill-paid td {
+    color: #6c757d;
+}
+
+.bill-table tr.bill-paid td:nth-child(2) {
+    text-decoration: line-through;
+}

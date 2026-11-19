@@ -1,0 +1,159 @@
+@page "/bills"
+@rendermode InteractiveServer
+@using System.Security.Claims
+@using ClearToClose.Data
+@using ClearToClose.Services
+@inject BillService BillService
+
+<PageTitle>Bills - ClearToClose</PageTitle>
+
+<h1>Bills</h1>
+<p>Add your monthly bills and mark each one paid as you pay it this month.</p>
+
+<div class="bill-totals">
+    <div>Total monthly bills: <strong>@BillService.MonthlyTotal(bills).ToString("C")</strong></div>
+    <div>Still due this month: <strong>@BillService.StillDue(bills).ToString("C")</strong></div>
+</div>
+
+<div class="card bill-form">
+    <div class="card-body">
+        <h2 class="h5">@(editingId is null ? "Add bill" : "Edit bill")</h2>
+
+        <EditForm Model="form" OnValidSubmit="SaveAsync" FormName="bill-form">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label for="bill-name" class="form-label">Name</label>
+                <InputText id="bill-name" class="form-control" @bind-Value="form.Name" placeholder="Rent" />
+                <ValidationMessage For="() => form.Name" />
+            </div>
+
+            <div class="row">
+                <div class="col mb-3">
+                    <label for="bill-amount" class="form-label">Amount</label>
+                    <InputNumber id="bill-amount" class="form-control" @bind-Value="form.Amount" step="0.01" />
+                    <ValidationMessage For="() => form.Amount" />
+                </div>
+                <div class="col mb-3">
+                    <label for="bill-due-day" class="form-label">Due day</label>
+                    <InputNumber id="bill-due-day" class="form-control" @bind-Value="form.DueDay" min="1" max="31" />
+                    <ValidationMessage For="() => form.DueDay" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="bill-category" class="form-label">Category</label>
+                <InputSelect id="bill-category" class="form-select" @bind-Value="form.Category">
+                    <option value="">Choose a category</option>
+                    @foreach (var category in Bill.Categories)
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => form.Category" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">@(editingId is null ? "Add" : "Save")</button>
+            @if (editingId is not null)
+            {
+                <button type="button" class="btn btn-outline-secondary ms-2" @onclick="CancelEdit">Cancel</button>
+            }
+        </EditForm>
+    </div>
+</div>
+
+@if (bills.Count == 0)
+{
+    <p class="text-muted">No bills added yet.</p>
+}
+else
+{
+    <table class="table bill-table">
+        <thead>
+            <tr>
+                <th>Paid</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Due day</th>
+                <th class="text-end">Amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bill in bills)
+            {
+                var paid = BillService.IsPaidThisMonth(bill);
+                <tr class="@(paid ? "bill-paid" : "")">
+                    <td>
+                        <input type="checkbox" class="form-check-input" checked="@paid"
+                               title="Paid this month" aria-label="Paid this month for @bill.Name"
+                               @onchange="e => SetPaidAsync(bill.Id, e.Value is true)" />
+                    </td>
+                    <td>@bill.Name</td>
+                    <td>@bill.Category</td>
+                    <td>@bill.DueDay</td>
+                    <td class="text-end">@bill.Amount.ToString("C")</td>
+                    <td class="text-end text-nowrap">
+                        <button class="btn btn-sm btn-outline-primary" @onclick="() => StartEdit(bill)">Edit</button>
+                        <button class="btn btn-sm btn-outline-danger ms-1" @onclick="() => DeleteAsync(bill.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    private string userId = "";
+    private List<Bill> bills = [];
+    private Bill form = new();
+    private int? editingId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync() => bills = await BillService.GetAllAsync(userId);
+
+    private async Task SaveAsync()
+    {
+        if (editingId is null)
+            await BillService.AddAsync(userId, form);
+        else
+            await BillService.UpdateAsync(userId, editingId.Value, form);
+
+        CancelEdit();
+        await LoadAsync();
+    }
+
+    private void StartEdit(Bill bill)
+    {
+        editingId = bill.Id;
+        form = new Bill { Name = bill.Name, Amount = bill.Amount, DueDay = bill.DueDay, Category = bill.Category };
+    }
+
+    private void CancelEdit()
+    {
+        editingId = null;
+        form = new Bill();
+    }
+
+    private async Task SetPaidAsync(int id, bool paid)
+    {
+        await BillService.SetPaidAsync(userId, id, paid);
+        await LoadAsync();
+    }
+
+    private async Task DeleteAsync(int id)
+    {
+        await BillService.DeleteAsync(userId, id);
+        if (editingId == id) CancelEdit();
+        await LoadAsync();
+    }
+}
