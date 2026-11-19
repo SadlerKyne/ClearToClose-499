@@ -31,4 +31,30 @@ public class BillService(IDbContextFactory<ApplicationDbContext> dbFactory)
         });
         await db.SaveChangesAsync();
     }
+
+    // Returns false if the bill doesn't exist or belongs to another user.
+    public async Task<bool> UpdateAsync(string userId, int id, Bill changes)
+    {
+        using var db = await dbFactory.CreateDbContextAsync();
+        var bill = await db.Bills.FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
+        if (bill is null) return false;
+
+        bill.Name = changes.Name.Trim();
+        bill.Amount = changes.Amount;
+        bill.DueDay = changes.DueDay;
+        bill.Category = changes.Category;
+        await db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> DeleteAsync(string userId, int id)
+    {
+        using var db = await dbFactory.CreateDbContextAsync();
+        var bill = await db.Bills.FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
+        if (bill is null) return false;
+
+        db.Bills.Remove(bill);
+        await db.SaveChangesAsync();
+        return true;
+    }
 }
