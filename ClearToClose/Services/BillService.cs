@@ -57,4 +57,29 @@ public class BillService(IDbContextFactory<ApplicationDbContext> dbFactory)
         await db.SaveChangesAsync();
         return true;
     }
+
+    // The current month as text, like "2026-11". A bill counts as paid
+    // only when its PaidMonth matches this, so every bill resets each month.
+    public static string CurrentMonth() => DateTime.Today.ToString("yyyy-MM");
+
+    // Marks a bill paid for the current month, or unmarks it.
+    public async Task<bool> SetPaidAsync(string userId, int id, bool paid)
+    {
+        using var db = await dbFactory.CreateDbContextAsync();
+        var bill = await db.Bills.FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
+        if (bill is null) return false;
+
+        bill.PaidMonth = paid ? CurrentMonth() : null;
+        await db.SaveChangesAsync();
+        return true;
+    }
+
+    public static bool IsPaidThisMonth(Bill bill) => bill.PaidMonth == CurrentMonth();
+
+    // Total of all bills for one month.
+    public static decimal MonthlyTotal(IEnumerable<Bill> bills) => bills.Sum(b => b.Amount);
+
+    // Total of the bills not paid yet this month.
+    public static decimal StillDue(IEnumerable<Bill> bills) =>
+        bills.Where(b => !IsPaidThisMonth(b)).Sum(b => b.Amount);
 }
