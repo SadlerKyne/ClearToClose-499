@@ -120,3 +120,17 @@ body:has(.auth-card) main {
 .bill-table tr.bill-paid td:nth-child(2) {
     text-decoration: line-through;
 }
+
+.income-total {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.income-form {
+    max-width: 28rem;
+    margin-bottom: 1.5rem;
+}
+
+.income-table {
+    max-width: 40rem;
+}

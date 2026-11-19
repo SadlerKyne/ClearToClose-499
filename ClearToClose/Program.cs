@@ -30,6 +30,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddScoped<BillService>();
+builder.Services.AddScoped<IncomeService>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // No email service is set up, so new accounts can log in without confirming their email.
