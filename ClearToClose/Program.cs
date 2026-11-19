@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ClearToClose.Components;
 using ClearToClose.Components.Account;
 using ClearToClose.Data;
+using ClearToClose.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // It also registers ApplicationDbContext itself, which Identity uses.
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
+builder.Services.AddScoped<BillService>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // No email service is set up, so new accounts can log in without confirming their email.
