@@ -12,7 +12,7 @@
 
 <div class="card bill-form">
     <div class="card-body">
-        <h2 class="h5">Add bill</h2>
+        <h2 class="h5">@(editingId is null ? "Add bill" : "Edit bill")</h2>
 
         <EditForm Model="form" OnValidSubmit="SaveAsync" FormName="bill-form">
             <DataAnnotationsValidator />
@@ -48,7 +48,11 @@
                 <ValidationMessage For="() => form.Category" />
             </div>
 
-            <button type="submit" class="btn btn-primary">Add</button>
+            <button type="submit" class="btn btn-primary">@(editingId is null ? "Add" : "Save")</button>
+            @if (editingId is not null)
+            {
+                <button type="button" class="btn btn-outline-secondary ms-2" @onclick="CancelEdit">Cancel</button>
+            }
         </EditForm>
     </div>
 </div>
@@ -66,6 +70,7 @@ else
                 <th>Category</th>
                 <th>Due day</th>
                 <th class="text-end">Amount</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -76,6 +81,10 @@ else
                     <td>@bill.Category</td>
                     <td>@bill.DueDay</td>
                     <td class="text-end">@bill.Amount.ToString("C")</td>
+                    <td class="text-end text-nowrap">
+                        <button class="btn btn-sm btn-outline-primary" @onclick="() => StartEdit(bill)">Edit</button>
+                        <button class="btn btn-sm btn-outline-danger ms-1" @onclick="() => DeleteAsync(bill.Id)">Delete</button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -89,6 +98,7 @@ else
     private string userId = "";
     private List<Bill> bills = [];
     private Bill form = new();
+    private int? editingId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -101,8 +111,31 @@ else
 
     private async Task SaveAsync()
     {
-        await BillService.AddAsync(userId, form);
+        if (editingId is null)
+            await BillService.AddAsync(userId, form);
+        else
+            await BillService.UpdateAsync(userId, editingId.Value, form);
+
+        CancelEdit();
+        await LoadAsync();
+    }
+
+    private void StartEdit(Bill bill)
+    {
+        editingId = bill.Id;
+        form = new Bill { Name = bill.Name, Amount = bill.Amount, DueDay = bill.DueDay, Category = bill.Category };
+    }
+
+    private void CancelEdit()
+    {
+        editingId = null;
         form = new Bill();
+    }
+
+    private async Task DeleteAsync(int id)
+    {
+        await BillService.DeleteAsync(userId, id);
+        if (editingId == id) CancelEdit();
         await LoadAsync();
     }
 }
