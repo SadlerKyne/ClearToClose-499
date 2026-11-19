@@ -53,6 +53,35 @@
     </div>
 </div>
 
+@if (bills.Count == 0)
+{
+    <p class="text-muted">No bills added yet.</p>
+}
+else
+{
+    <table class="table bill-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Due day</th>
+                <th class="text-end">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bill in bills)
+            {
+                <tr>
+                    <td>@bill.Name</td>
+                    <td>@bill.Category</td>
+                    <td>@bill.DueDay</td>
+                    <td class="text-end">@bill.Amount.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> AuthState { get; set; } = default!;
