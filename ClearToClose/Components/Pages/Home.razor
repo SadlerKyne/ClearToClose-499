@@ -9,7 +9,18 @@
 
 <p>Track your income, bills and debts, and see your debt-to-income ratio before you talk to a lender.</p>
 
-@if (summary is not null)
+@if (summary is not null && summary.IsEmpty)
+{
+    <div class="card dashboard-empty">
+        <div class="card-body">
+            <h2 class="h5">Get started</h2>
+            <p>Add your income and bills to see your monthly totals and DTI.</p>
+            <a href="income" class="btn btn-primary">Add income</a>
+            <a href="bills" class="btn btn-outline-primary ms-2">Add bills</a>
+        </div>
+    </div>
+}
+else if (summary is not null)
 {
     <div class="dashboard-cards">
         <div class="card dashboard-card">
