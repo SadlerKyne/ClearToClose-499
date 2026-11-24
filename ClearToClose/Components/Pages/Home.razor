@@ -30,6 +30,13 @@
                 <div class="dashboard-value @(summary.MoneyLeft < 0 ? "dashboard-negative" : "")">@summary.MoneyLeft.ToString("C")</div>
             </div>
         </div>
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="dashboard-label">Debt-to-income (DTI)</div>
+                <div class="dashboard-value">@(summary.DtiPercent is null ? "--" : $"{summary.DtiPercent}%")</div>
+                <span class="dti-badge @DtiCalculator.StatusClass(summary.DtiPercent)">@DtiCalculator.Status(summary.DtiPercent)</span>
+            </div>
+        </div>
     </div>
 }
 
