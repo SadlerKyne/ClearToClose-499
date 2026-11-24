@@ -9,4 +9,7 @@ public class DashboardSummary
 
     // What is left each month after bills and debt payments.
     public decimal MoneyLeft => Income - Bills - DebtPayments;
+
+    // DTI percent from debt payments and income, or null with no income.
+    public decimal? DtiPercent => DtiCalculator.Percent(DebtPayments, Income);
 }
