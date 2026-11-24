@@ -16,7 +16,9 @@ public class DashboardService(IDbContextFactory<ApplicationDbContext> dbFactory)
         return new DashboardSummary
         {
             Income = IncomeService.MonthlyTotal(incomes),
-            Bills = BillService.MonthlyTotal(bills)
+            Bills = BillService.MonthlyTotal(bills),
+            IncomeCount = incomes.Count,
+            BillCount = bills.Count
         };
     }
 }
