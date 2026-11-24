@@ -1,7 +1,24 @@
 @page "/"
+@using System.Security.Claims
+@using ClearToClose.Services
+@inject DashboardService DashboardService
 
 <PageTitle>ClearToClose</PageTitle>
 
 <h1>ClearToClose</h1>
 
 <p>Track your income, bills and debts, and see your debt-to-income ratio before you talk to a lender.</p>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    private DashboardSummary? summary;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+        summary = await DashboardService.GetSummaryAsync(userId);
+    }
+}
