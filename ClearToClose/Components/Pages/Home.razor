@@ -9,6 +9,30 @@
 
 <p>Track your income, bills and debts, and see your debt-to-income ratio before you talk to a lender.</p>
 
+@if (summary is not null)
+{
+    <div class="dashboard-cards">
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="dashboard-label">Monthly income</div>
+                <div class="dashboard-value">@summary.Income.ToString("C")</div>
+            </div>
+        </div>
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="dashboard-label">Monthly bills</div>
+                <div class="dashboard-value">@summary.Bills.ToString("C")</div>
+            </div>
+        </div>
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="dashboard-label">Money left after bills</div>
+                <div class="dashboard-value @(summary.MoneyLeft < 0 ? "dashboard-negative" : "")">@summary.MoneyLeft.ToString("C")</div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> AuthState { get; set; } = default!;
