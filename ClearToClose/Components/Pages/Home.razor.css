@@ -29,3 +29,32 @@
     max-width: 32rem;
     margin-top: 1.5rem;
 }
+
+.dti-badge {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.dti-ready {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.dti-close {
+    background: #fff3cd;
+    color: #664d03;
+}
+
+.dti-not-yet {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.dti-none {
+    background: #e9ecef;
+    color: #495057;
+}
